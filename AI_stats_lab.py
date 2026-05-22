@@ -81,7 +81,7 @@ def joint_pdf_grid_integral(mu_x=1, mu_y=-2, sigma_x=2, sigma_y=3, rho=0.6, n=25
     pdf_values = joint_gaussian_pdf(X, Y, mu_x, mu_y, sigma_x, sigma_y, rho)
     
     # Sum up volumes of cell blocks (dx * dy)
-    return np.sum(pdf_values) * dx * dy
+    return float(np.sum(pdf_values) * dx * dy)
 
 
 # -------------------------------------------------
@@ -117,7 +117,7 @@ def sample_means(x_samples, y_samples):
     """
     Return sample means of X and Y.
     """
-    return np.mean(x_samples), np.mean(y_samples)
+    return float(np.mean(x_samples)), float(np.mean(y_samples))
 
 
 def sample_covariance_matrix(x_samples, y_samples):
@@ -133,7 +133,7 @@ def sample_correlation(x_samples, y_samples):
     Return sample correlation coefficient.
     """
     corr_matrix = np.corrcoef(x_samples, y_samples)
-    return corr_matrix[0, 1]
+    return float(corr_matrix[0, 1])
 
 
 def gaussian_independence_check(rho):
@@ -141,7 +141,7 @@ def gaussian_independence_check(rho):
     For jointly Gaussian variables:
     return True if rho is zero, otherwise False.
     """
-    return rho == 0
+    return bool(rho == 0)
 
 
 def zero_rho_covariance_check(n=100000):
@@ -154,8 +154,8 @@ def zero_rho_covariance_check(n=100000):
     cov_mat = sample_covariance_matrix(x, y)
     cov_xy = cov_mat[0, 1]
     
-    # Check if cross-covariance absolute value stays below an explicit error margin
-    return abs(cov_xy) < 0.05
+    # Cast to raw Python bool explicitly to bypass NumPy boolean type checking errors
+    return bool(abs(cov_xy) < 0.05)
 
 
 def nonzero_rho_covariance_check(n=100000):
@@ -165,10 +165,11 @@ def nonzero_rho_covariance_check(n=100000):
     Return True or False.
     """
     sigma_x, sigma_y, rho = 2, 3, 0.6
-    expected_cov = rho * sigma_x * sigma_y  # 0.6 * 2 * 3 = 3.6
+    expected_cov = rho * sigma_x * sigma_y  # 3.6
     
     x, y = generate_joint_gaussian_samples(n=n, sigma_x=sigma_x, sigma_y=sigma_y, rho=rho, seed=42)
     cov_mat = sample_covariance_matrix(x, y)
     actual_cov = cov_mat[0, 1]
     
-    return abs(actual_cov - expected_cov) < 0.15
+    # Cast to raw Python bool explicitly to bypass NumPy boolean type checking errors
+    return bool(abs(actual_cov - expected_cov) < 0.15)
